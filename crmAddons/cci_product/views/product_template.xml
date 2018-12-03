@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="product_model_temp" model="ir.ui.view">
+        <field name="name">Product Template</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                    <field name="stage_ids" widget="statusbar" statusbar_visible="New,To Validate,Validated" clickable="True"/>
+            </xpath>
+
+            <xpath expr="//group[@name='group_standard_price']" position="after">
+                <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//page[@name='sales']" position="after">
+
+                <page name="customers" string="Customers"
+                      attrs="{'invisible': ['|',('type','=', 'visit'), ('type','=', 'mem_ship')]}">
+                    <field name="product_ids"/>
+                </page>
+
+                <page name="visit" string="Visit Plan" attrs="{'invisible': [('type','!=', 'visit')]}">
+                    <field name="visitor_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="visit_date"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="note"/>
+                        </tree>
+                    </field>
+                </page>
+
+                <page name="session" string="Session" attrs="{'invisible': [('type','!=', 'Training')]}">
+                    <field name="session_ids">
+                        <tree>
+                            <field name="name"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </tree>
+                    </field>
+                </page>
+
+                <page name="participant" string="Participants">
+                    <field name="contact_ids">
+                        <tree>
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </page>
+
+            </xpath>
+
+            <xpath expr="//form/sheet/div/div[@name='options']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type','=', 'visit')]}</attribute>
+            </xpath>
+
+            <xpath expr="//form/sheet/notebook/page/group/group[@name='group_standard_price']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type','=', 'visit')]}</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='sales']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type','=', 'visit')]}</attribute>
+            </xpath>
+
+            <!--<xpath expr="//form/sheet/notebook/page/page[@name='invoicing']" position="attributes">-->
+                <!--<attribute name="attrs">{'invisible': [('type','=', 'visit')]}</attribute>-->
+            <!--</xpath>-->
+        </field>
+    </record>
+
+    <record id="product_model_temp_hide" model="ir.ui.view">
+        <field name="name">Account Template</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="account.product_template_form_view"/>
+        <field name="arch" type="xml">
+           <xpath expr="//page[@name='invoicing']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type','=', 'visit')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+        <record id="group_category_equipe_ccit" model="ir.module.category">
+            <field name="name">Équipe CCIT</field>
+            <field name="description">Equipe CCIT</field>
+        </record>
+
+         <record id="department_manager_group" model="res.groups">
+            <field name="name">Department Manager</field>
+            <field name="category_id" ref="group_category_equipe_ccit"/>
+        </record>
+        <record id="commercial_group" model="res.groups">
+            <field name="name">Commercial</field>
+            <field name="category_id" ref="group_category_equipe_ccit"/>
+        </record>
+        <record id="president_group" model="res.groups">
+            <field name="name">President</field>
+            <field name="category_id" ref="group_category_equipe_ccit"/>
+        </record>
+        <record id="general_manager_group" model="res.groups">
+            <field name="name">General manager</field>
+            <field name="category_id" ref="group_category_equipe_ccit"/>
+        </record>
+    </data>
+</odoo>
+
+

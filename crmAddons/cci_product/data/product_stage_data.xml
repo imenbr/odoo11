@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record model="cci_product.product_stage" id="stage_product1">
+        <field name="name">New</field>
+    </record>
+
+    <record model="cci_product.product_stage" id="stage_product2">
+        <field name="name">To Validate</field>
+    </record>
+
+    <record model="cci_product.product_stage" id="stage_product3">
+        <field name="name">Validated</field>
+    </record>
+</odoo>
