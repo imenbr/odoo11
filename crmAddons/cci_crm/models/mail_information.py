@@ -57,6 +57,21 @@ class cciCrmMailInformation(models.Model):
     scheduled_date = fields.Char('Scheduled Send Date',
                                  help="If set, the queue manager will send the email after the date."
                                       " If not set, the email will be send as soon as possible.")
+    # filter
+    filter_type = fields.Selection([
+        ('product', 'All economic operators who ordered a particular product'),
+        ('membership_status', 'All economic operators who have a membership'),
+        ('activity_sector', 'All economic operators belonging to one or more sectors of activity'),
+        ('group', 'All economic operators belonging to a particular group')], string="Category")
+    product_id = fields.Many2one('product.template', string='Product')
+    membership = fields.Selection(
+        [
+            ('paying', 'Paying Member'),
+            ('other', 'Other')
+        ], 'State Of Membership')
+    sector = fields.Many2many('res.partner.category', 'mail_res_partner_rel', 'mail_filtre_id', 'categ_res_partner_id',
+                              string='Sector Of Activities')
+    group_id = fields.Many2one('res.partner.group', string='Particular Group')
 
     @api.model
     def create(self, values):
@@ -381,4 +396,9 @@ class cciCrmMailInformation(models.Model):
             if auto_commit is True:
                 self._cr.commit()
         return True
+
+    def send_info_mail(self):
+        if self.filter_type == 'product' and self.product_id:
+            print("heeeere", self.product_id.name, self.product_id.id)
+            self.email_to = self.product_id.name
 

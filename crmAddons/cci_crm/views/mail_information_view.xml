@@ -117,13 +117,54 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="category_filter_form_view">
+        <field name="name">Filter Form</field>
+        <field name="model">mail.information</field>
+        <field name="arch" type="xml">
+            <form>
+                <div>
+                    <separator string="Select a recipient:" colspan="4"/>
+                    <group>
+                        <field name="filter_type" required="1" placeholder="Please choose your recipients"/>
+                    </group>
+                </div>
+
+                <group attrs="{'invisible':[('filter_type','!=', 'product')]}">
+                    <field name="product_id" widget="selection" style="width:60%%"/>
+                </group>
+                <group attrs="{'invisible':[('filter_type','!=', 'membership_status')]}">
+                    <field name="membership" style="width:60%%"/>
+                </group>
+                <group attrs="{'invisible':[('filter_type','!=', 'activity_sector')]}">
+                    <field name="sector" widget="many2many_tags" style="width:60%%"/>
+                </group>
+                <group attrs="{'invisible':[('filter_type','!=', 'group')]}">
+                    <field name="group_id" style="width:60%%"/>
+                </group>
+                <footer>
+                    <div class="oe_button_box oe_right">
+                        <button name="send_info_mail" type="object" string="Send Newsletter" class="oe_highlight"/>
+                    </div>
+                </footer>
+            </form>
+        </field>
+        </record>
+
         <record id="action_view_mail_mail_information" model="ir.actions.act_window">
             <field name="name">Emails</field>
             <field name="res_model">mail.information</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="context">{}</field>
             <field name="search_view_id" ref="view_mail_search_information"/>
+        </record>
+
+        <record id="action_wizard_customized_mail_information" model="ir.actions.act_window">
+            <field name="name">Choice of economic operators</field>
+            <field name="res_model">mail.information</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="category_filter_form_view"/>
+            <field name="target">new</field>
         </record>
 
         <menuitem id="information_letter_menu" name="Information letter" parent="crm.crm_menu_root"/>
@@ -132,7 +173,7 @@
         <menuitem id="customers_menu" name="For Customers" parent="information_letter_menu"
                   action="action_view_mail_mail_information"/>
         <menuitem id="customized_menu" name="customized" parent="information_letter_menu"
-                  action="action_view_mail_mail_information"/>
+                  action="action_wizard_customized_mail_information"/>
 
     </data>
 </odoo>
