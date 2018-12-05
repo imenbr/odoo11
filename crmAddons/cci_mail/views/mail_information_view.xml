@@ -1,7 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <record model="ir.ui.view" id="test_view">
+        <!--Customer View , To is invisible-->
+        <record model="ir.ui.view" id="customer_view">
+            <field name="name">mail view</field>
+            <field name="model">mail.information</field>
+            <field name="arch" type="xml">
+                <form string="Email message">
+                    <header>
+                        <button name="send" string="Send Now" type="object" states='outgoing' class="oe_highlight"/>
+                        <button name="mark_outgoing" string="Retry" type="object" states='exception,cancel'/>
+                        <button name="cancel" string="Cancel" type="object" states='outgoing'/>
+                        <field name="state" widget="statusbar" statusbar_visible="outgoing,sent,received,exception,cancel"/>
+                    </header>
+                    <sheet>
+                        <field name="mail_message_id" required="0" invisible="1"/>
+                        <label for="subject" class="oe_edit_only"/>
+                        <h2><field name="subject"/></h2>
+                        <div style="vertical-align: top;">
+                            by <field name="author_id" class="oe_inline" string="User"/> on <field name="date" readonly="1" class="oe_inline"/>
+
+                        </div>
+                        <group>
+                            <field name="email_from"/>
+                            <field name="email_to" invisible="1"/>
+                            <field name="recipient_ids" widget="many2many_tags"/>
+                            <field name="email_cc"/>
+                            <field name="reply_to"/>
+                            <field name="scheduled_date"/>
+                        </group>
+                        <notebook>
+                            <page string="Body">
+                                <field name="body_html" widget="html" options="{'style-inline': true}"/>
+                            </page>
+                            <page string="Advanced" groups="base.group_no_one">
+                                <group>
+                                    <group string="Status">
+                                        <field name="auto_delete"/>
+                                        <field name="notification"/>
+                                        <field name="message_type"/>
+                                        <field name="mail_server_id"/>
+                                        <field name="model"/>
+                                        <field name="res_id"/>
+                                    </group>
+                                    <group string="Headers">
+                                        <field name="message_id"/>
+                                        <field name="references"/>
+                                        <field name="headers"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Attachments">
+                                <field name="attachment_ids"/>
+                            </page>
+                            <page string="Failure Reason" attrs="{'invisible': [('state', '!=', 'exception')]}">
+                                <field name="failure_reason"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Public View , To Partners is invisible-->
+        <record model="ir.ui.view" id="public_view">
             <field name="name">mail view</field>
             <field name="model">mail.information</field>
             <field name="arch" type="xml">
@@ -23,7 +85,7 @@
                         <group>
                             <field name="email_from"/>
                             <field name="email_to"/>
-                            <field name="recipient_ids" widget="many2many_tags"/>
+                            <field name="recipient_ids" widget="many2many_tags" invisible="1"/>
                             <field name="email_cc"/>
                             <field name="reply_to"/>
                             <field name="scheduled_date"/>
@@ -62,7 +124,29 @@
             </field>
         </record>
 
-        <record model="ir.ui.view" id="view_mail_tree_information">
+        <record model="ir.ui.view" id="view_mail_tree_information_public">
+            <field name="name">mail.mail.tree</field>
+            <field name="model">mail.information</field>
+            <field name="arch" type="xml">
+                <tree string="Emails" decoration-muted="state in ('sent', 'cancel')" decoration-info="state=='outgoing'" decoration-danger="state=='exception'">
+                    <field name="date"/>
+                    <field name="subject"/>
+                    <field name="author_id" string="User"/>
+                    <field name="message_id" invisible="1"/>
+                    <field name="recipient_ids" invisible="1"/>
+                    <field name="model" invisible="1"/>
+                    <field name="res_id" invisible="1"/>
+                    <field name="email_from" invisible="1"/>
+                    <field name="state" invisible="1"/>
+                    <field name="message_type" invisible="1"/>
+                    <button name="send" string="Send Now" type="object" icon="fa-paper-plane text-success" states='outgoing'/>
+                    <button name="mark_outgoing" string="Retry" type="object" icon="fa-repeat text-success" states='exception,cancel'/>
+                    <button name="cancel" string="Cancel Email" type="object" icon="fa-times-circle text-danger" states='outgoing'/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_mail_tree_information_customer">
             <field name="name">mail.mail.tree</field>
             <field name="model">mail.information</field>
             <field name="arch" type="xml">
@@ -119,7 +203,7 @@
 
         <record model="ir.ui.view" id="category_filter_form_view">
         <field name="name">Filter Form</field>
-        <field name="model">mail.information</field>
+        <field name="model">mail.information.filtre</field>
         <field name="arch" type="xml">
             <form>
                 <div>
@@ -150,17 +234,70 @@
         </field>
         </record>
 
-        <record id="action_view_mail_mail_information" model="ir.actions.act_window">
-            <field name="name">Emails</field>
+        <!--ACTION for public_menu-->
+        <record id="action_view_mail_information_Public" model="ir.actions.act_window">
+            <field name="name">Emails For Public</field>
             <field name="res_model">mail.information</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_mail_search_information"/>
+            <field name="view_id" ref="view_mail_tree_information_public"/>
+            <field name="domain">[('type_menu','=','nadherent')]</field>
+            <field name="context">{'type_menu':'nadherent'}</field>
         </record>
 
+           <!--ACTION WINDOW VIEW tree Public-->
+        <record id="action_view_mail_information_tree_public" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_mail_tree_information_public"/>
+            <field name="domain">[('type_menu','=','nadherent')]</field>
+            <field name="act_window_id" ref="action_view_mail_information_Public"/>
+        </record>
+
+        <!--ACTION WINDOW VIEW form Public-->
+        <record id="action_view_mail_information_form_public" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="public_view"/>
+            <field name="domain">[('type_menu','=','nadherent')]</field>
+            <field name="act_window_id" ref="action_view_mail_information_Public"/>
+        </record>
+
+        <!--ACTION for customers_menu-->
+        <record id="action_view_mail_information_Customer" model="ir.actions.act_window">
+            <field name="name">Emails For Customer</field>
+            <field name="res_model">mail.information</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_mail_search_information"/>
+            <field name="view_id" ref="view_mail_tree_information_customer"/>
+            <field name="domain">[('type_menu','=','adherent')]</field>
+            <field name="context">{'type_menu':'adherent'}</field>
+        </record>
+
+         <!--ACTION WINDOW VIEW form Customer-->
+        <record id="action_view_mail_information_tree_customer" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_mail_tree_information_customer"/>
+            <field name="domain">[('type_menu','=','adherent')]</field>
+            <field name="act_window_id" ref="action_view_mail_information_Customer"/>
+        </record>
+
+        <!--ACTION WINDOW VIEW form Customer-->
+        <record id="action_view_mail_information_form_customer" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="customer_view"/>
+            <field name="domain">[('type_menu','=','adherent')]</field>
+            <field name="act_window_id" ref="action_view_mail_information_Customer"/>
+        </record>
+
+        <!--ACTION for customized_menu-->
         <record id="action_wizard_customized_mail_information" model="ir.actions.act_window">
             <field name="name">Choice of economic operators</field>
-            <field name="res_model">mail.information</field>
+            <field name="res_model">mail.information.filtre</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="view_id" ref="category_filter_form_view"/>
@@ -169,9 +306,9 @@
 
         <menuitem id="information_letter_menu" name="Information letter" parent="crm.crm_menu_root"/>
         <menuitem id="public_menu" name="Public" parent="information_letter_menu"
-                  action="action_view_mail_mail_information"/>
+                  action="action_view_mail_information_Public"/>
         <menuitem id="customers_menu" name="For Customers" parent="information_letter_menu"
-                  action="action_view_mail_mail_information"/>
+                  action="action_view_mail_information_Customer"/>
         <menuitem id="customized_menu" name="customized" parent="information_letter_menu"
                   action="action_wizard_customized_mail_information"/>
 

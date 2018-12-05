@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
 from . import models
-from . import res_partner_group
+from . import mail_information

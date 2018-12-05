@@ -20,14 +20,15 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'crm'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
-        'security/cci_security.xml'
+        'security/cci_security.xml',
+        'views/res_partner_group_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
