@@ -408,18 +408,46 @@ class cciCrmMailInformationFiltre(models.Model):
                               string='Sector Of Activities')
     group_id = fields.Many2one('res.partner.group', string='Particular Group')
 
-
     @api.multi
     def send_info_mail(self):
-        # if self.filter_type == 'product' and self.product_id:
-        #     print(self.env['crm.lead'].search(['product_id', '=', self.product_id]))
-        #     print(self.browse().filter_type)
-            return {
-                'name': 'mail view',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'mail.information',
-                'view_id ref= customer_view': True,
-                'type': 'ir.actions.act_window',
-                'target': 'current',
-            }
+        if self.filter_type == 'product' and self.product_id:
+            new_mail_info = self.env['mail.information'].create({'type_menu': 'adherent'})
+            op_eco_particip_ids = []
+            product_won = self.env['crm.lead'].search([('product_id', '=', self.product_id.id),
+                                                      ('stage_id.name', '=', "Won")])
+            for obj in product_won:
+                op_eco_particip_ids.append(obj.partner_id.id)
+
+            for op_eco_id in op_eco_particip_ids:
+                self.env.cr.execute(
+                    'INSERT INTO mail_information_res_partner_rel(mail_information_id,res_partner_id) '
+                    'VALUES(' + str(new_mail_info.id) + ',' + str(op_eco_id) + ')')
+
+        if self.filter_type == 'group' and self.group_id:
+            new_mail_info = self.env['mail.information'].create({'type_menu': 'adherent'})
+            op_eco_ids = []
+            new_mail_info = self.env['mail.information'].create({'type_menu': 'adherent'})
+            self.env.cr.execute\
+                ('SELECT res_partner_id FROM res_partner_res_partner_group_rel WHERE res_partner_group_id =' +
+                 str(self.group_id.id,))
+            partners_ids = self.env.cr.fetchall()
+
+            for obj in partners_ids:
+                op_eco_ids.append(obj[0])
+
+            for partner in op_eco_ids:
+                self.env.cr.execute(
+                    'INSERT INTO mail_information_res_partner_rel(mail_information_id,res_partner_id) '
+                    'VALUES(' + str(new_mail_info.id) + ',' + str(partner) + ')')
+
+        return {
+            'name': 'mail view',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.information',
+            'view_id ref= customer_view': True,
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'res_id': int(new_mail_info),
+            'context': {'form_view_initial_mode': 'edit', 'force_detailed_view': True}
+        }
