@@ -410,8 +410,8 @@ class cciCrmMailInformationFiltre(models.Model):
 
     @api.multi
     def send_info_mail(self):
+        new_mail_info = self.env['mail.information'].create({'type_menu': 'adherent'})
         if self.filter_type == 'product' and self.product_id:
-            new_mail_info = self.env['mail.information'].create({'type_menu': 'adherent'})
             op_eco_particip_ids = []
             product_won = self.env['crm.lead'].search([('product_id', '=', self.product_id.id),
                                                       ('stage_id.name', '=', "Won")])
@@ -424,15 +424,36 @@ class cciCrmMailInformationFiltre(models.Model):
                     'VALUES(' + str(new_mail_info.id) + ',' + str(op_eco_id) + ')')
 
         if self.filter_type == 'group' and self.group_id:
-            new_mail_info = self.env['mail.information'].create({'type_menu': 'adherent'})
             op_eco_ids = []
-            new_mail_info = self.env['mail.information'].create({'type_menu': 'adherent'})
             self.env.cr.execute\
                 ('SELECT res_partner_id FROM res_partner_res_partner_group_rel WHERE res_partner_group_id =' +
                  str(self.group_id.id,))
             partners_ids = self.env.cr.fetchall()
 
             for obj in partners_ids:
+                op_eco_ids.append(obj[0])
+
+            for partner in op_eco_ids:
+                self.env.cr.execute(
+                    'INSERT INTO mail_information_res_partner_rel(mail_information_id,res_partner_id) '
+                    'VALUES(' + str(new_mail_info.id) + ',' + str(partner) + ')')
+
+        if self.filter_type == 'activity_sector' and self.sector:
+            list = []
+            op_eco_ids = []
+            partners_ids = []
+            for obj in self.sector:
+                list.append(obj.id)
+
+            for c in list:
+                self.env.cr.execute(
+                    'SELECT partner_id FROM res_partner_res_partner_category_rel WHERE category_id =' + str(c))
+                result = self.env.cr.fetchall()
+                for res in result:
+                    partners_ids.append(res)
+
+            for obj in partners_ids:
+                print(obj[0])
                 op_eco_ids.append(obj[0])
 
             for partner in op_eco_ids:

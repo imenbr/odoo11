@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+      <record id="economic_op_view" model="ir.ui.view">
+        <field name="name">Product stages view</field>
+        <field name="model">res.partner.group</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                    <field name="name"/>
+                    <field name="code"/>
+                    </group>
+                    <field name="partner_ids"/>
+
+                </sheet>
+            </form>
+        </field>
+      </record>
+
+    <record id="economic_op_view_tree" model="ir.ui.view">
+        <field name="name">Product stages view</field>
+        <field name="model">res.partner.group</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+      </record>
+
+    <record model="ir.actions.act_window" id="economic_operator_group_action">
+            <field name="name">Economic Operators Group</field>
+            <field name="res_model">res.partner.group</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="economic_op_view_tree"/>
+    </record>
+
+    <menuitem id="group_oe" name="Economic Operators Group" parent="crm.crm_menu_config"
+              action="economic_operator_group_action"/>
+</odoo>
